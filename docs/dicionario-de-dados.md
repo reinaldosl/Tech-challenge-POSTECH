@@ -9,7 +9,7 @@ Descrição das tabelas e colunas da camada **processed** (`data/processed/`), b
 | Camada | Pasta | Conteúdo | Gerada por |
 |---|---|---|---|
 | raw | `data/raw/` | 9 CSVs originais da Olist, sem alteração | download do Kaggle |
-| processed | `data/processed/` | Tabelas padronizadas + tabelas derivadas | `notebooks/normalizacao-dados.ipynb` e `notebooks/tabelas-categorias.ipynb` |
+| processed | `data/processed/` | Tabelas padronizadas, derivadas e agregadas | `notebooks/normalizacao-dados.ipynb`, `notebooks/tabelas-categorias.ipynb` e `notebooks/agregacoes-crescimento-receita.ipynb` |
 
 ## Padrões aplicados a todas as tabelas processed
 
@@ -35,6 +35,11 @@ Descrição das tabelas e colunas da camada **processed** (`data/processed/`), b
 | `orders_enriched` | pedido | `order_id` | 99.441 | derivada |
 | `order_items_category` | item de pedido | `order_id` + `order_item_id` | 112.650 | derivada |
 | `category_reviews` | categoria | `product_category_name` | 74 | derivada |
+| `agg_mensal` | mês | `purchase_year_month` | 20 | agregada |
+| `agg_categoria` | categoria | `product_category_name` | 74 | agregada |
+| `agg_uf` | UF do cliente | `customer_state` | 27 | agregada |
+| `agg_produto` | produto | `product_id` | 32.081 | agregada |
+| `agg_seller` | seller | `seller_id` | 2.945 | agregada |
 
 ## Relacionamentos
 
@@ -220,4 +225,87 @@ Uma linha por categoria, com indicadores agregados.
 | `pct_atraso` | decimal | % de pedidos atrasados (0 a 100) | Média de `is_late` × 100, um registro por pedido e categoria |
 | `receita` | decimal | Soma do preço dos itens da categoria (sem frete) | Soma de `price` |
 
-> `receita` considera pedidos de todos os status. Para receita realizada, recalcule a partir de `order_items_category` filtrando `order_status == "DELIVERED"`.
+> `receita` considera pedidos de todos os status e só o preço (sem frete). Para a receita realizada no padrão do projeto, use `agg_categoria`.
+
+
+---
+
+## Tabelas agregadas (crescimento e receita)
+
+Geradas por `notebooks/agregacoes-crescimento-receita.ipynb`. Todas seguem as mesmas regras:
+
+- **Somente pedidos `DELIVERED`**, com compra entre **jan/2017 e ago/2018**.
+- **Receita = preço + frete** (valor total pago pelo cliente).
+- **Ticket médio = receita ÷ pedidos.**
+- **`participacao_receita_pct`** = receita da linha ÷ receita total do período × 100 (0 a 100).
+
+A receita total é a mesma em todas as tabelas: **R$ 15.373.120,01**.
+
+### `agg_mensal`
+
+Uma linha por mês (20 meses).
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `purchase_year_month` | texto | Mês da compra (`AAAA-MM`) |
+| `pedidos` | inteiro | Quantidade de pedidos |
+| `receita` | decimal | Receita do mês |
+| `ticket_medio` | decimal | Receita ÷ pedidos |
+| `crescimento_receita_pct` | decimal | Variação da receita em relação ao mês anterior (%). Vazio no primeiro mês |
+
+### `agg_categoria`
+
+Uma linha por categoria (74), ordenada pela receita.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `product_category_name` | texto | Categoria em português (`SEM CATEGORIA` para produtos sem cadastro) |
+| `product_category_name_english` | texto | Categoria em inglês |
+| `pedidos` | inteiro | Pedidos com ao menos um item da categoria |
+| `itens` | inteiro | Itens vendidos |
+| `receita` | decimal | Soma de preço + frete dos itens da categoria |
+| `participacao_receita_pct` | decimal | % da receita total |
+
+> A soma de `pedidos` entre categorias é maior que o total de pedidos, porque um pedido com itens de duas categorias conta nas duas.
+
+### `agg_uf`
+
+Uma linha por UF do cliente (27), ordenada pela receita.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `customer_state` | texto | UF do cliente |
+| `pedidos` | inteiro | Quantidade de pedidos |
+| `receita` | decimal | Receita da UF |
+| `ticket_medio` | decimal | Receita ÷ pedidos |
+| `participacao_receita_pct` | decimal | % da receita total |
+
+### `agg_produto`
+
+Uma linha por produto vendido no período (32.081). Para o top 10, ordene por `receita` ou `itens`.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `product_id` | texto | Identificador do produto |
+| `product_category_name` | texto | Categoria em português |
+| `pedidos` | inteiro | Pedidos que incluíram o produto |
+| `itens` | inteiro | Unidades vendidas |
+| `receita` | decimal | Soma de preço + frete |
+| `preco_medio` | decimal | Preço médio de venda (sem frete) |
+| `participacao_receita_pct` | decimal | % da receita total |
+
+### `agg_seller`
+
+Uma linha por seller com vendas no período (2.945). Para o top 10, ordene por `receita`.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `seller_id` | texto | Identificador do vendedor |
+| `pedidos` | inteiro | Pedidos com itens do seller |
+| `itens` | inteiro | Itens vendidos |
+| `receita` | decimal | Soma de preço + frete dos itens do seller |
+| `review_medio` | decimal | Avaliação média, um registro por pedido e seller |
+| `pct_atraso` | decimal | % de pedidos atrasados (0 a 100), um registro por pedido e seller |
+| `seller_city` | texto | Cidade do seller |
+| `seller_state` | texto | UF do seller |
+| `participacao_receita_pct` | decimal | % da receita total |
