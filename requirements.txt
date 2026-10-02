@@ -1,0 +1,16 @@
+# Bibliotecas do projeto Tech Challenge - Fase 1 (Olist)
+# Instalação: python -m pip install -r requirements.txt
+
+# Manipulação de dados
+pandas>=2.2.3
+numpy>=2.1
+
+# Visualização
+matplotlib>=3.9
+seaborn>=0.13.2
+plotly>=5.24
+missingno>=0.5.2
+
+# Ambiente de notebooks
+jupyter
+ipykernel
