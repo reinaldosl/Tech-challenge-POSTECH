@@ -21,7 +21,8 @@ Tech-challenge-POSTECH/
 │   ├── inventario-de-dados.ipynb # Fase 1
 │   ├── normalizacao-dados.ipynb  # Fase 2
 │   ├── tabelas-categorias.ipynb  # Fase 3
-│   └── agregacoes-crescimento-receita.ipynb  # Fase 5
+│   ├── agregacoes-crescimento-receita.ipynb  # Fase 5
+│   └── pagamentos-clientes.ipynb             # Frente 3
 ├── src/
 │   └── librarys.ipynb            # Bibliotecas usadas em todos os notebooks
 └── requirements.txt
@@ -67,6 +68,33 @@ Primeiro olhar sobre as 9 tabelas: tamanho, tipos, nulos, duplicados e se as tab
 `notebooks/agregacoes-crescimento-receita.ipynb`
 
 Evolução mensal de pedidos, receita e ticket médio; participação por categoria e UF; top produtos e sellers. Considera só pedidos entregues de jan/2017 a ago/2018. Gera as tabelas `agg_mensal`, `agg_categoria`, `agg_uf`, `agg_produto` e `agg_seller` em `data/processed/`.
+
+### Frente 3 — Clientes e Pagamentos
+`notebooks/pagamentos-clientes.ipynb`
+
+Base: `orders_enriched` + `customers` (via `customer_id`), apenas pedidos `DELIVERED` de jan/2017 a ago/2018. Clientes contados por `customer_unique_id`. Validação: receita total de R$ 15.373.120,01, igual às tabelas agregadas.
+
+**RFM**
+- Recência: dias entre a última compra e 29/08/2018. R e M divididos em quintis (nota 5 = melhor).
+- Frequência em 3 faixas (1, 2 e 3+ pedidos): 97% dos clientes compraram uma única vez, o que impede a divisão em quintis.
+- 5 segmentos: Recorrentes, Novos de alto valor, Novos de baixo valor, Inativos de alto valor e Inativos de baixo valor.
+
+**Coorte**
+- Coorte = mês da primeira compra; retenção = % de clientes da coorte que compraram em cada mês seguinte.
+
+**Previsão**
+- Teste com treino até mai/2018 e validação em jun–ago/2018: tendência linear (erro de 34,2%) x média dos 3 meses recentes (erro de 11,8%). Escolhida a média recente.
+
+**Pagamentos**
+- Participação por forma de pagamento (em pedidos e em valor) e perfil de parcelamento no cartão, agrupado em faixas (1x, 2-3x, 4-6x, 7-10x, 11x+). Pedidos com mais de um pagamento contados uma única vez (contagem distinta de `order_id`); 2 pagamentos com 0 parcelas desconsiderados.
+
+**Principais achados**
+- 97% dos clientes compraram uma única vez; apenas 8% dos que compraram duas vezes voltaram para uma terceira.
+- Em média, 0,5% dos clientes voltam a comprar no mês seguinte à primeira compra, sem melhora de 2017 para 2018.
+- Clientes de alto valor (38% da base) geraram 68% da receita.
+- Prioridade: novos de alto valor (15,5% dos clientes, 28,4% da receita, última compra há 91 dias em média).
+- Cartão de crédito em 77% dos pedidos. Dois terços dos pagamentos no cartão são parcelados; a faixa de 7 a 10x concentra 31% do valor pago no cartão com 15% dos pagamentos.
+- Previsão de cerca de R$ 1,01 milhão/mês para set–nov/2018 (faixa de R$ 889 mil a R$ 1,13 milhão). Não incorpora sazonalidade: novembro tende a superar a faixa por efeito da Black Friday.
 
 ## Guia para o time
 
