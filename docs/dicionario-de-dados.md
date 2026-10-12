@@ -9,7 +9,7 @@ Descrição das tabelas e colunas da camada **processed** (`data/processed/`), b
 | Camada | Pasta | Conteúdo | Gerada por |
 |---|---|---|---|
 | raw | `data/raw/` | 9 CSVs originais da Olist, sem alteração | download do Kaggle |
-| processed | `data/processed/` | Tabelas padronizadas, derivadas e agregadas | `notebooks/normalizacao-dados.ipynb`, `notebooks/tabelas-categorias.ipynb` e `notebooks/agregacoes-crescimento-receita.ipynb` |
+| processed | `data/processed/` | Tabelas padronizadas, derivadas e agregadas | `notebooks/tratamento/normalizacao-dados.ipynb`, `notebooks/tratamento/tabelas-categorias.ipynb` e `notebooks/analises/agregacoes-crescimento-receita.ipynb` |
 
 ## Padrões aplicados a todas as tabelas processed
 
@@ -232,7 +232,7 @@ Uma linha por categoria, com indicadores agregados.
 
 ## Tabelas agregadas (crescimento e receita)
 
-Geradas por `notebooks/agregacoes-crescimento-receita.ipynb`. Todas seguem as mesmas regras:
+Geradas por `notebooks/analises/agregacoes-crescimento-receita.ipynb`. Todas seguem as mesmas regras:
 
 - **Somente pedidos `DELIVERED`**, com compra entre **jan/2017 e ago/2018**.
 - **Receita = preço + frete** (valor total pago pelo cliente).

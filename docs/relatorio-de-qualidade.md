@@ -2,8 +2,8 @@
 
 Avaliação da qualidade dos dados brutos da Olist (`data/raw/`) e registro de tudo o que foi alterado, removido ou mantido na camada processed (`data/processed/`).
 
-- **Diagnóstico:** `notebooks/inventario-de-dados.ipynb`
-- **Tratamento:** `notebooks/normalizacao-dados.ipynb` e `notebooks/tabelas-categorias.ipynb`
+- **Diagnóstico:** `notebooks/tratamento/inventario-de-dados.ipynb`
+- **Tratamento:** `notebooks/tratamento/normalizacao-dados.ipynb` e `notebooks/tratamento/tabelas-categorias.ipynb`
 - **Descrição das colunas:** [dicionário de dados](dicionario-de-dados.md)
 
 ## Resumo
