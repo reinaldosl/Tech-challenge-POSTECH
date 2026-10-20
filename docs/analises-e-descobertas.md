@@ -9,7 +9,7 @@ Todas as análises partem da base tratada em `data/processed/` e seguem as [regr
 | 1. Crescimento e Receita + Base de Dados | `agregacoes-crescimento-receita.ipynb` | Concluída |
 | 2. Logística e SLA + Dados Externos | `analise_logistica.ipynb` | Entregue, documentação pendente |
 | 3. Clientes e Pagamentos + Previsão | `pagamentos-clientes.ipynb` | Concluída |
-| 4. Satisfação do Cliente + Padrão Visual | — | Em andamento |
+| 4. Satisfação do Cliente + Padrão Visual | `satisfacao-do-cliente.ipynb` | Entregue, documentação pendente |
 | 5. Recomendações + Storytelling | — | Em andamento |
 
 ---
@@ -72,13 +72,31 @@ Base: `orders_enriched` + `customers` (via `customer_id`), apenas pedidos `DELIV
 
 ---
 
+
 ## Frente 4 — Satisfação do Cliente
+`notebooks/analises/satisfacao-do-cliente.ipynb`
 
-*Em andamento.*
+**Status:** Concluído.
 
-**Por onde começar:** `reviews` (comentários em maiúsculas e sem acento), `review_score` e `is_late` em `orders_enriched`, `category_reviews`.
+**Objetivo:** Analisar a satisfação dos clientes com base nas avaliações dos pedidos, identificando fatores relacionados à insatisfação e oportunidades de melhoria.
 
-**Cuidados:** alguns pedidos têm mais de uma avaliação; em `orders_enriched` o `review_score` já é a média do pedido. O padrão visual do grupo pode ser aplicado em `src/librarys.ipynb`, que todos os notebooks carregam.
+**Análises realizadas:**
+- Distribuição das avaliações de 1 a 5 estrelas.
+- Classificação das avaliações em satisfeitas, neutras e insatisfeitas.
+- Relação entre atrasos nas entregas e notas recebidas.
+- Análise da satisfação por faixa de valor dos pedidos.
+- Identificação de categorias com maiores índices de insatisfação.
+- Análise dos comentários e possíveis sinais de risco de abandono.
+
+**Bases utilizadas:** `orders_enriched.csv`, `reviews.csv`, `order_items_category.csv` e `customers.csv`.
+
+**Principais resultados:**
+- Total de pedidos analisados: 99.441.
+- Pedidos com avaliação: 98.673.
+- Nota média das avaliações: 4,09.
+- Predominância de avaliações positivas.
+
+**Cuidados:** Alguns pedidos possuem mais de uma avaliação. Para evitar duplicidades, foi considerada a avaliação mais recente de cada pedido. As análises utilizam os dados tratados, sem alterar os arquivos originais.
 
 ---
 
