@@ -76,8 +76,6 @@ Base: `orders_enriched` + `customers` (via `customer_id`), apenas pedidos `DELIV
 ## Frente 4 — Satisfação do Cliente
 `notebooks/analises/satisfacao-do-cliente.ipynb`
 
-**Status:** Concluído.
-
 **Objetivo:** Analisar a satisfação dos clientes com base nas avaliações dos pedidos, identificando fatores relacionados à insatisfação e oportunidades de melhoria.
 
 **Análises realizadas:**
