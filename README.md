@@ -53,7 +53,11 @@ Tech-challenge-POSTECH/
 │   └── analises/                     # Análises de cada frente
 │       ├── agregacoes-crescimento-receita.ipynb  # Frente 1
 │       ├── analise_logistica.ipynb               # Frente 2
-│       └── pagamentos-clientes.ipynb             # Frente 3
+│       ├── pagamentos-clientes.ipynb             # Frente 3
+│       └── diagnostico-problemas-comportamento.ipynb  # Cruzamento logística x pagamentos x satisfação
+├── entregaveis/
+│   ├── Relatorio_Executivo_Olist.pdf        # Relatório executivo
+│   └── Apresentacao_Executiva_Olist.pptx    # Apresentação de 5 minutos
 ├── src/
 │   └── librarys.ipynb            # Bibliotecas usadas em todos os notebooks
 └── requirements.txt
