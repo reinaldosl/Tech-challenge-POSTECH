@@ -1,16 +1,16 @@
 # Análises e descobertas
 
-Métodos e principais achados de cada frente do projeto. Para a ideia geral, os requisitos e o uso da base, veja o [README](../README.md).
+Métodos e principais achados de cada frente do projeto. Para a visão geral e os entregáveis, veja o [README](../README.md).
 
-Todas as análises partem da base tratada em `data/processed/` e seguem as [regras para as análises](relatorio-de-qualidade.md#8-regras-para-as-análises): receita só de pedidos `DELIVERED`, período de jan/2017 a ago/2018 e clientes contados por `customer_unique_id`.
+Todas as análises partem da base tratada em `data/processed/` e seguem as [premissas das análises](relatorio-de-qualidade.md#8-premissas-das-análises): receita só de pedidos `DELIVERED`, período de jan/2017 a ago/2018 e clientes contados por `customer_unique_id`.
 
-| Frente | Notebook | Status |
-|---|---|---|
-| 1. Crescimento e Receita + Base de Dados | `agregacoes-crescimento-receita.ipynb` | Concluída |
-| 2. Logística e SLA + Dados Externos | `analise_logistica.ipynb` | Entregue, documentação pendente |
-| 3. Clientes e Pagamentos + Previsão | `pagamentos-clientes.ipynb` | Concluída |
-| 4. Satisfação do Cliente + Padrão Visual | `satisfacao-do-cliente.ipynb` | Entregue, documentação pendente |
-| 5. Recomendações + Storytelling | — | Em andamento |
+| Frente | Notebook |
+|---|---|
+| 1. Crescimento e Receita + Base de Dados | `agregacoes-crescimento-receita.ipynb` |
+| 2. Logística e SLA + Dados Externos | `analise_logistica.ipynb` |
+| 3. Clientes e Pagamentos + Previsão | `pagamentos-clientes.ipynb` |
+| 4. Satisfação do Cliente | `satisfacao-do-cliente.ipynb` |
+| 5. Recomendações + Storytelling | `diagnostico-problemas-comportamento.ipynb` |
 
 ---
 
@@ -35,11 +35,20 @@ Todas as análises partem da base tratada em `data/processed/` e seguem as [regr
 ## Frente 2 — Logística e SLA
 `notebooks/analises/analise_logistica.ipynb`
 
-*Documentação de método e achados a ser incluída pela responsável pela frente.*
+**Método**
+- Base: `orders_enriched`. Para o lead time, só pedidos com datas em ordem cronológica (postagem depois da compra e entrega depois da postagem).
+- Lead time por etapa e por UF: compra → aprovação → postagem → entrega.
+- Atraso = entrega depois do prazo prometido (`order_estimated_delivery_date`).
+- Dados externos: renda e população por UF do IBGE, juntadas aos indicadores logísticos na tabela `analise_regional_completa`, usada também pela Frente 5.
 
-**Por onde começar:** `orders_enriched` — datas de compra, aprovação, postagem e entrega; `dt_diff`; `is_late`; `customer_state`.
+**Principais achados**
+- A correlação entre atraso e nota de avaliação é de **-0,33** (negativa moderada): pedidos atrasados recebem notas menores.
+- A etapa de transporte (postagem até a entrega) é a que mais varia entre as UFs, enquanto aprovação e postagem são parecidas em todo o país.
 
-**Cuidados:** 166 pedidos com postagem antes da compra e 23 com entrega antes da postagem distorcem o lead time. Na `geolocation`, 33 coordenadas estão fora do Brasil e cada CEP tem vários pontos (use a média).
+**Dados externos (IBGE)** — `data/external/ibge_uf.csv`
+- `renda_media_ibge`: rendimento nominal mensal domiciliar per capita, 2025 — IBGE, PNAD Contínua (divulgado em 27/02/2026).
+- `populacao_estimada`: população residente — IBGE, Censo Demográfico 2022 (primeira divulgação, jun/2023).
+- Os valores de MG (20.869.101) e ES (3.885.049) diferem do Censo 2022 (20.539.989 e 3.833.712). Foram mantidos como usados nas análises. Com os valores do Censo, o único número afetado seria o de pedidos por 100 mil habitantes no Sudeste, de 77 para 78.
 
 ---
 
@@ -72,7 +81,6 @@ Base: `orders_enriched` + `customers` (via `customer_id`), apenas pedidos `DELIV
 
 ---
 
-
 ## Frente 4 — Satisfação do Cliente
 `notebooks/analises/satisfacao-do-cliente.ipynb`
 
@@ -88,18 +96,49 @@ Base: `orders_enriched` + `customers` (via `customer_id`), apenas pedidos `DELIV
 
 **Bases utilizadas:** `orders_enriched.csv`, `reviews.csv`, `order_items_category.csv` e `customers.csv`.
 
-**Principais resultados:**
-- Total de pedidos analisados: 99.441.
-- Pedidos com avaliação: 98.673.
-- Nota média das avaliações: 4,09.
-- Predominância de avaliações positivas.
+**Método**
+- Unidade de análise: pedido. Pedidos com mais de uma avaliação ficam com a mais recente.
+- Notas 1–2 = insatisfeito, 3 = neutro, 4–5 = satisfeito.
+- Categoria do pedido = categoria de maior valor entre os itens; só categorias com 100+ pedidos avaliados.
+- Temas dos comentários identificados por palavras-chave (entrega, produto, atendimento, preço, embalagem).
+- Risco de churn (proxy): cliente cuja última compra avaliada recebeu nota 1–2. Não há rótulo de churn na base.
 
-**Cuidados:** Alguns pedidos possuem mais de uma avaliação. Para evitar duplicidades, foi considerada a avaliação mais recente de cada pedido. As análises utilizam os dados tratados, sem alterar os arquivos originais.
+**Principais achados**
+- 98.673 pedidos avaliados, nota média de **4,09**: 77% de notas 4–5 e 15% de notas 1–2.
+- **Atraso é o principal fator de insatisfação:** 54% de notas 1–2 nos pedidos atrasados, contra 9% nos entregues no prazo. Acima de 30 dias de entrega, 63% de notas baixas.
+- Pedidos de maior valor têm um pouco mais de insatisfação (18% de notas baixas no quartil mais caro, contra 12% no mais barato).
+- Categorias com maior proporção de notas baixas: moda masculina (26%), móveis de escritório (23%) e áudio (22%).
+- Nos comentários, os temas mais citados são produto/qualidade e entrega/atraso; menções a atendimento e embalagem têm a maior proporção de notas baixas (45% e 46%).
+- 14,7% dos clientes têm sinal de risco de churn (última compra avaliada com nota 1–2).
+
+**Cuidados:** as relações são descritivas e não provam causa; os comentários são uma amostra autosselecionada.
 
 ---
 
 ## Frente 5 — Recomendações e Storytelling
+`notebooks/analises/diagnostico-problemas-comportamento.ipynb`
 
-*Em andamento.*
+Cruza logística, pagamentos e satisfação para identificar os problemas da operação (Partes A a D) e responde à pergunta de negócio (Parte E):
 
-**Por onde começar:** as tabelas `agg_*` e os achados das frentes acima.
+> Como a Olist pode transformar o crescimento das vendas em um negócio sustentável, aumentando a fidelização dos clientes e melhorando a experiência de compra?
+
+Resultado consolidado no [relatório executivo](../entregaveis/Relatorio_Executivo_Olist.pdf) e na [apresentação](../entregaveis/Apresentacao_Executiva_Olist.pptx).
+
+**Principais achados**
+- **O gargalo é o transporte:** 9,4 dos 12,6 dias médios de entrega (74%) ficam entre a postagem e a entrega.
+- **A promessa de prazo é desigual:** Norte recebe 18 a 21 dias de folga e quase não atrasa; o Nordeste recebe 9 a 14 dias e lidera os atrasos (AL 21%, MA 18%). RJ tem 12% de atraso em 12,3 mil pedidos.
+- **Crise de atraso em fev–mar/2018** (até 19% de atraso) sem pico de volume.
+- **28% dos atrasos começam no seller**, que posta depois do prazo combinado.
+- **Pedidos com mais de um seller** têm nota 2,86 (contra 4,17): o cliente recebe parte do pedido e avalia o que falta.
+- **O boleto atrasa a aprovação** em cerca de 1 dia; pedidos com voucher são cancelados quase 3x mais.
+- **O crescimento veio de clientes novos e parou em 2018:** só 2,2% da receita vem de clientes recorrentes. O cliente que volta gasta o dobro (R$ 321 x R$ 162), mas só 2,8% voltam.
+- **Experiência ruim reduz a recompra** (atraso na 1ª compra: 2,0% x 2,9%), mas mesmo a melhor experiência leva a cerca de 3%. Um programa de fidelização que leve a recompra a 5% renderia cerca de R$ 258 mil em 12 meses.
+- **O Nordeste tem 27% da população e 9% dos pedidos**, com pior experiência em atraso, frete, nota e recompra.
+
+**Recomendações (hipóteses a testar)**
+1. Entregar o que promete: calibrar o prazo por rota, SLA de postagem para sellers e avisar entregas divididas.
+2. Criar motivos para voltar: contatos e cupom de segunda compra entre 30 e 90 dias após a entrega, com foco nas categorias de maior recompra.
+3. Crescer no Nordeste depois de corrigir a experiência, atraindo sellers locais.
+4. Cuidar da saúde financeira: revisar o parcelamento sem juros acima de 6x e incentivar pagamento instantâneo.
+
+**Limitações:** comparações descritivas; a base não traz transportadora, custos de marketing nem dados de conversão.

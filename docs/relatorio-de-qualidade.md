@@ -148,9 +148,9 @@ Incluir as pontas em análises de evolução mensal criaria quedas artificiais.
 
 ---
 
-## 8. Regras para as análises
+## 8. Premissas das análises
 
-Decisões que não foram aplicadas na base (para não limitar outras análises), mas devem ser seguidas por quem a utiliza:
+Decisões que não foram aplicadas na base, para não limitar outras análises, e que foram adotadas nos notebooks de análise:
 
 1. **Receita e ticket médio:** considerar apenas pedidos com `order_status == "DELIVERED"`.
 2. **Evolução temporal:** usar o período de **jan/2017 a ago/2018**.
