@@ -18,6 +18,7 @@ Relatório executivo para investidores e acionistas construído a partir do [dat
 
 | Entregável | Arquivo |
 |---|---|
+| 🎥 Vídeo executivo (até 5 min) | [youtu.be/PilxiR41t3w](https://youtu.be/PilxiR41t3w) |
 | Relatório executivo | [entregaveis/Relatorio_Executivo_Olist.pdf](entregaveis/Relatorio_Executivo_Olist.pdf) |
 | Apresentação executiva (~5 min, com roteiro nas anotações) | [entregaveis/Apresentacao_Executiva_Olist.pptx](entregaveis/Apresentacao_Executiva_Olist.pptx) |
 | Métodos e achados de cada análise | [docs/analises-e-descobertas.md](docs/analises-e-descobertas.md) |
