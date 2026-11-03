@@ -9,7 +9,8 @@ Descrição das tabelas e colunas da camada **processed** (`data/processed/`), b
 | Camada | Pasta | Conteúdo | Gerada por |
 |---|---|---|---|
 | raw | `data/raw/` | 9 CSVs originais da Olist, sem alteração | download do Kaggle |
-| processed | `data/processed/` | Tabelas padronizadas, derivadas e agregadas | `notebooks/tratamento/normalizacao-dados.ipynb`, `notebooks/tratamento/tabelas-categorias.ipynb` e `notebooks/analises/agregacoes-crescimento-receita.ipynb` |
+| external | `data/external/` | Dados externos: população e renda por UF (IBGE) | IBGE — Censo 2022 e PNAD Contínua 2025 |
+| processed | `data/processed/` | Tabelas padronizadas, derivadas e agregadas | `notebooks/tratamento/normalizacao-dados.ipynb`, `notebooks/tratamento/tabelas-categorias.ipynb`, `notebooks/analises/agregacoes-crescimento-receita.ipynb` e `notebooks/analises/analise_logistica.ipynb` |
 
 ## Padrões aplicados a todas as tabelas processed
 
@@ -40,6 +41,7 @@ Descrição das tabelas e colunas da camada **processed** (`data/processed/`), b
 | `agg_uf` | UF do cliente | `customer_state` | 27 | agregada |
 | `agg_produto` | produto | `product_id` | 32.081 | agregada |
 | `agg_seller` | seller | `seller_id` | 2.945 | agregada |
+| `analise_regional_completa` | UF do cliente | `customer_state` | 27 | agregada + IBGE |
 
 ## Relacionamentos
 
@@ -309,3 +311,23 @@ Uma linha por seller com vendas no período (2.945). Para o top 10, ordene por `
 | `seller_city` | texto | Cidade do seller |
 | `seller_state` | texto | UF do seller |
 | `participacao_receita_pct` | decimal | % da receita total |
+
+---
+
+## Tabela regional (logística + IBGE)
+
+### `analise_regional_completa`
+
+Gerada por `notebooks/analises/analise_logistica.ipynb`. Uma linha por UF do cliente (27), ordenada pelo número de pedidos. Considera os pedidos entregues com datas em ordem cronológica (postagem depois da compra e entrega depois da postagem), de todo o período.
+
+| Coluna | Tipo | Descrição |
+|---|---|---|
+| `customer_state` | texto | UF do cliente |
+| `total_pedidos` | inteiro | Quantidade de pedidos |
+| `ticket_medio` | decimal | Média de `order_price` (só produtos, sem frete) |
+| `media_dias_transporte` | decimal | Média de dias entre a postagem e a entrega |
+| `taxa_atraso_perc` | decimal | % de pedidos entregues depois do prazo prometido (0 a 100) |
+| `renda_media_ibge` | inteiro | Rendimento nominal mensal domiciliar per capita, em R$ (IBGE, PNAD Contínua 2025) |
+| `populacao_estimada` | inteiro | População residente da UF (IBGE, Censo Demográfico 2022) |
+
+As duas últimas colunas vêm de `data/external/ibge_uf.csv`. Fontes e observações em [análises e descobertas](analises-e-descobertas.md#frente-2--logística-e-sla).

@@ -2,3 +2,7 @@
 .claude/
 CLAUDE.md
 CLAUDE.local.md
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
